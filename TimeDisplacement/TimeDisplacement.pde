@@ -15,7 +15,7 @@ int signal = 0;
 ArrayList frames = new ArrayList();
 
 void setup() {
-  size(640, 480);
+  fullScreen();
   
   // This the default video input, see the GettingStartedCapture 
   // example if it creates an error
@@ -78,8 +78,3 @@ void draw() {
   // For recording an image sequence
   //saveFrame("frame-####.jpg"); 
 }
-
-
-
-
-TimeDisplacement
