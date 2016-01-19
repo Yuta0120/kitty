@@ -102,10 +102,10 @@ class Sphere{
 
     // Did I hit the face?
     for (int i = 0; i < faces.length; ++i) {
-      int x1 = faces[i].x;
-      int x2 = faces[i].x + faces[i].width;
-      int y1 = faces[i].y;
-      int y2 = faces[i].y + faces[i].height;
+      float x1 = faces[i].x;
+      float x2 = faces[i].x + faces[i].width;
+      float y1 = faces[i].y;
+      float y2 = faces[i].y + faces[i].height;
 
 //      if(loc.x >= x1 && loc.x <= x2 && loc.y >= y1 && loc.y <= y2){
 //        float d_x1  = abs(x1-loc.x);
