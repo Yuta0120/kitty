@@ -38,6 +38,7 @@ boolean IsDragged = false;
 
 void setup() {
   size(640, 480);
+  //size(720, 480);
   ratio = 0.5;
   w = int(width*ratio);
   h = int(height*ratio);
@@ -107,7 +108,7 @@ void draw() {
   // Copy the webcam image to the temporary integer array iArray.
   arrayCopy(small.pixels, iArray);
 
-  background(255); // Make background white so that the rect looks like it's moving    
+  //background(255); // Make background white so that the rect looks like it's moving    
   
   // Define the temporary Java byte and integer buffers.
   // They share the same storage.
@@ -162,8 +163,8 @@ void draw() {
 ///  }
 ///}
 
-float g_const = 9.80665 * 1e-1; // Gravity acceleration in earth in m/s^2
-//float g_const = 2; // Gravity acceleration in earth in m/s^2
+//float g_const = 9.80665 * 1e-1; // Gravity acceleration in earth in m/s^2
+float g_const = 0; // Gravity acceleration in earth in m/s^2
 PVector acc_g = new PVector(0, g_const);
 
 class Sphere{
@@ -298,8 +299,8 @@ class Sphere{
     stroke(0, 255, 0); // Make the frame green
     strokeWeight(3); // Make the frame width 3    
     //ellipse(loc.x, loc.y, diameter, diameter);
-    ellipse(loc.x, loc.y, 10, 10);
-    //image(miku, loc.x, loc.y);
+    //ellipse(loc.x, loc.y, 10, 10);
+    image(miku, loc.x, loc.y);
     
     // Did I hit the face?
     for (int i = 0; i < rects.length; ++i) {

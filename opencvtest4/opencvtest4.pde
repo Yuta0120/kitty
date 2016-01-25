@@ -213,8 +213,8 @@ class Sphere{
     stroke(0, 255, 0); // Make the frame green
     strokeWeight(3); // Make the frame width 3    
     //ellipse(loc.x, loc.y, diameter, diameter);
-    ellipse(loc.x, loc.y, 10, 10);
-    //image(miku, loc.x, loc.y);
+    //ellipse(loc.x, loc.y, 10, 10);
+    image(miku, loc.x, loc.y);
     
     // Did I hit the face?
     for (int i = 0; i < faces.length; ++i) {
