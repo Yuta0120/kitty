@@ -1,21 +1,58 @@
+import processing.core.*; 
+import processing.data.*; 
+import processing.event.*; 
+import processing.opengl.*; 
+
+import processing.video.*; 
+import java.util.*; 
+import java.nio.*; 
+import org.opencv.core.Core; 
+import org.opencv.core.Mat; 
+import org.opencv.core.CvType; 
+import org.opencv.core.Scalar; 
+import org.opencv.objdetect.HOGDescriptor; 
+import org.opencv.core.MatOfRect; 
+import org.opencv.core.MatOfDouble; 
+import org.opencv.core.Rect; 
+import org.opencv.core.Size; 
+import org.opencv.imgproc.Imgproc; 
+
+import java.util.HashMap; 
+import java.util.ArrayList; 
+import java.io.File; 
+import java.io.BufferedReader; 
+import java.io.PrintWriter; 
+import java.io.InputStream; 
+import java.io.OutputStream; 
+import java.io.IOException; 
+
+public class mikumiku2 extends PApplet {
+
 
 // Taken from: http://www.magicandlove.com/blog/2014/03/06/people-detection-in-processing-with-opencv/
 
-import processing.video.*;
+// Human detection
+// Goku
+// Miku
+// Tsuru
+// Ame
+// Should be made stable
 
-import java.util.*;
-import java.nio.*;
 
-import org.opencv.core.Core;
-import org.opencv.core.Mat;
-import org.opencv.core.CvType;
-import org.opencv.core.Scalar;
-import org.opencv.objdetect.HOGDescriptor;
-import org.opencv.core.MatOfRect;
-import org.opencv.core.MatOfDouble;
-import org.opencv.core.Rect;
-import org.opencv.core.Size;
-import org.opencv.imgproc.Imgproc;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 Capture cap;
 PImage small;
@@ -27,8 +64,10 @@ int pixCnt1, pixCnt2;
 int w, h;
 float ratio;
 
+Rect [] rects;
+
 Sphere[] spheres;
-int numSpheres = 20;
+int numSpheres = 30;
 
 PImage miku1;
 PImage miku2;
@@ -37,24 +76,24 @@ PImage goku2;
 PImage tsuru1;
 PImage tsuru2;
 
-Rect [] rects;
+public void setup() {
 
-boolean IsDragged = false;
-
-void setup() {
-  //fullScreen();
   size(640, 480);
   //size(720, 480);
   //size(1280, 720);  
-  ratio = 0.5;
-  w = int(width*ratio);
-  h = int(height*ratio);
+  ratio = 0.5f;
+  w = PApplet.parseInt(width*ratio);
+  h = PApplet.parseInt(height*ratio);
 
   if(frame != null){
     frame.setResizable(true);
   }
 
   size(displayWidth, displayHeight);
+  
+  ratio = 0.5f;
+  w = PApplet.parseInt(width*ratio);
+  h = PApplet.parseInt(height*ratio);
 
   background(0);
   // Define and initialise the default capture device.
@@ -79,9 +118,11 @@ void setup() {
   hog = new HOGDescriptor();
   hog.setSVMDetector(HOGDescriptor.getDefaultPeopleDetector());
   noFill();
-  stroke(255, 255, 0);  
-  
-  // Setup miku
+  stroke(255, 255, 0);
+
+  //////////////////////////////////////////////////
+  // Setup miku (if this one is not here, it works)
+  //////////////////////////////////////////////////
   miku1  = loadImage("Miku1.png" );  
   miku2  = loadImage("Miku2.png" );
   goku1  = loadImage("Goku1.png" );  
@@ -89,43 +130,38 @@ void setup() {
   tsuru1 = loadImage("Tsuru1.png");  
   tsuru2 = loadImage("Tsuru2.png");
   
+//for ame  ame1   = loadImage("Ame1.png");  
+//for ame  ame2   = loadImage("Ame2.png");
+  
   // Setup spheres
   spheres = new Sphere[numSpheres];
   for(int i = 0;i < spheres.length;++i){
     float x  = random(width);
-    float y  = 0.0;
-    float vx = random(0.5,15);
-    float vy = 0.0;       
+    float y  = 0.0f;
+    float vx = random(0.5f,15);
+    float vy = 0.0f;       
     PVector loc = new PVector(x , y );
     PVector vel = new PVector(vy, vx);
     PVector acc = new PVector(0, 0);
     float diam = random(5);
     spheres[i] = new Sphere(loc, vel, acc, diam);
   }
-  
+  ////////////////////////////////////////////////////  
 }
 
-void draw() {
+public void draw() {
   if (cap.available()) {
     cap.read();
   }
   else {
     return;
   }
-
-  if(keyPressed == true){
-    if(IsDragged == false) IsDragged = true ;
-    else                   IsDragged = false;
-  }
-    
   image(cap, 0, 0);
   // Resize the video to a smaller PImage.
   small.copy(cap, 0, 0, width, height, 0, 0, w, h);
   // Copy the webcam image to the temporary integer array iArray.
   arrayCopy(small.pixels, iArray);
 
-  //background(255); // Make background white so that the rect looks like it's moving    
-  
   // Define the temporary Java byte and integer buffers.
   // They share the same storage.
   ByteBuffer bBuf = ByteBuffer.allocate(pixCnt1);
@@ -149,40 +185,50 @@ void draw() {
   MatOfRect found = new MatOfRect();
   MatOfDouble weight = new MatOfDouble();
 
-  hog.detectMultiScale(m3, found, weight, 0, new Size(8, 8), new Size(32, 32), 1.05, 2, false);
+  hog.detectMultiScale(m3, found, weight, 0, new Size(8, 8), new Size(32, 32), 1.05f, 2, false);
 
-  rects = found.toArray();
+  //Rect [] rects = found.toArray();
+  rects = found.toArray();  
   if (rects.length > 0) {
     for (int i=0; i<rects.length; i++) {
+      // To eliminate frame, comment out this
       rect(rects[i].x/ratio, rects[i].y/ratio, rects[i].width/ratio, rects[i].height/ratio);
     }
   }
+  text("Frame Rate: " + round(frameRate), 500, 50);
 
-  if(IsDragged == true){
+  //////////////////////////////////////////////
+  {
     for(int i = 0;i < spheres.length;++i){
       spheres[i].Update();
       spheres[i].Show();
     }
-  }//if
-  text("Frame Rate: " + round(frameRate), 500, 50);
-
+  }
+  //////////////////////////////////////////////
+  
   ellipse(0,0,10,10);
-  ellipse(640,0,10,10);
-  ellipse(0,480,10,10);  
+  ellipse(displayWidth,0,10,10);
+  ellipse(0,displayHeight,10,10);
 }
 
-int myNumber(){
+///////////////////////////
+// Sphere
+///////////////////////////
+
+//float g_const = 9.80665 * 1e-1; // Gravity acceleration in earth in m/s^2
+float g_const = 1; // Gravity acceleration in earth in m/s^2
+PVector acc_g = new PVector(0, g_const);
+
+public int myNumber(){
   int ret = -1;
-  float x = random(3.0);
-  if((0.0 <= x) && (x < 1.0)) ret = 0;
-  if((1.0 <= x) && (x < 2.0)) ret = 1;
-  if((2.0 <= x) && (x < 3.0)) ret = 2;  
+  float x = random(3.0f);
+  //float x = random(4.0);  // for ame
+  if((0.0f <= x) && (x < 1.0f)) ret = 0;
+  if((1.0f <= x) && (x < 2.0f)) ret = 1;
+  if((2.0f <= x) && (x < 3.0f)) ret = 2;
+  //if((3.0 <= x) && (x < 4.0)) ret = 3; // for ame    
   return ret;
 }
-
-float g_const = 9.80665 * 1e-1; // Gravity acceleration in earth in m/s^2
-//float g_const = 0; // Gravity acceleration in earth in m/s^2
-PVector acc_g = new PVector(0, g_const);
 
 class Sphere{
   PVector loc;     // location
@@ -206,7 +252,7 @@ class Sphere{
     didIhit  = false;
   }
 
-  void Update(){
+  public void Update(){
 
     // Did I hit the face?
     for (int i = 0; i < rects.length; ++i) {
@@ -214,64 +260,37 @@ class Sphere{
       float x2 = rects[i].x/ratio + rects[i].width/ratio;
       float y1 = rects[i].y/ratio;
       float y2 = rects[i].y/ratio + rects[i].height/ratio;
-
-      // (1) Bound on x1
-      {
-        double nextx = loc.x + vel.x;
-        // If I pass the x1-line from left to right and otherway around
-        if((loc.x < x1 && nextx >= x1) || (loc.x >= x1 && nextx < x1)) {
-          loc.x = x1;
-          vel.x = -vel.x;
-          didIhit = true;
-        }             
-      }//(1)      
-
-      // (2) Bound on y1
-      {
-        double nexty = loc.y + vel.y;
-        // If I pass the y1-line from down to up and otherway around
-        if((loc.y < y1 && nexty >= y1) || (loc.y >= y1 && nexty < y1)) {
-          loc.y = y1;
-          vel.y = -vel.y;
-          didIhit = true;          
-        }             
-      }//(2)      
-
-      // (3) Bound on x2
-      {
-        double nextx = loc.x + vel.x;
-        // If I pass the x2-line from left to right and otherway around
-        if((loc.x < x2 && nextx >= x2) || (loc.x >= x2 && nextx < x2)) {
-          loc.x = x2;
-          vel.x = -vel.x;
-          didIhit = true;          
-        }             
-      }//(3)      
-
-      // (4) Bound on y2
-      {
-        double nexty = loc.y + vel.y;
-        // If I pass the y2-line from down to up and otherway around
-        if((loc.y < y2 && nexty >= y2) || (loc.y >= y2 && nexty < y2)) {
-          loc.y = y2;
-          vel.y = -vel.y;
-          didIhit = true;          
-        }             
-      }//(4)      
+      double nexty = loc.y + vel.y;
       
+      // (1) point is inside human
+      if((x1 <= loc.x) && (loc.x <= x2) && (y1 <= loc.y) && (loc.y <= y1)){
+          loc.y = y1;
+          vel.x = random(-50,50);
+          vel.y = -vel.y;          
+          didIhit = true;        
+      }
+
+      // (1) point is inside human
+      if((x1 <= loc.x) && (loc.x <= x2) && (y1 <= nexty) && (loc.y <= y1)){
+          loc.y = y1;
+          vel.x = random(-50,50);
+          vel.y = -vel.y;          
+          didIhit = true;        
+      }
+            
     }//i
 
     // (0) Am I in the screen?
-    if((loc.x <  width && loc.y <  height) && (loc.x >= 0 && loc.y >= 0)){
+    if((loc.x <  displayWidth && loc.y <  displayHeight) && (loc.x >= 0 && loc.y >= 0)){
       amIinScreen = true;      
     }
     else amIinScreen = false;
     
     print("\n");
-    print("? loc.x <   width =" + (loc.x <  width ) + "\n");
-    print("? loc.y <   height=" + (loc.y <  height) + "\n");
-    print("? loc.x >=  0     =" + (loc.x >= 0     ) + "\n");
-    print("? loc.y >=  0     =" + (loc.y >= 0     ) + "\n");
+    print("? loc.x <   width =" + (loc.x <  displayWidth ) + "\n");
+    print("? loc.y <   height=" + (loc.y <  displayHeight) + "\n");
+    print("? loc.x >=  0     =" + (loc.x >= 0            ) + "\n");
+    print("? loc.y >=  0     =" + (loc.y >= 0            ) + "\n");
     
     if(amIinScreen){
       loc.add(vel);
@@ -279,18 +298,13 @@ class Sphere{
       vel.add(acc_g); // effect of gravity
     }
     else{
-//      if(loc.x >  width ) loc.x -= width;
-//      if(loc.y >  height) loc.y -= height;
-//      if(loc.x <= 0.0   ) loc.x += width;
-//      if(loc.y <= 0.0   ) loc.y += height;      
-
       whatIam  = myNumber();
     
-      vel.y = random(0.5,15);
-      vel.x = 0.0;
+      vel.y = random(0.5f,15);
+      vel.x = 0.0f;
       
       loc.x = random(width);
-      loc.y = 0.0;
+      loc.y = 0.0f;
       
       loc.add(vel);
       vel.add(acc);
@@ -301,23 +315,25 @@ class Sphere{
     }
   }//End update
 
-  void Show(){
-    fill(255); // Make the face seeable    
-    stroke(0, 255, 0); // Make the frame green
-    strokeWeight(3); // Make the frame width 3    
-//    //ellipse(loc.x, loc.y, diameter, diameter);
-//    //ellipse(loc.x, loc.y, 10, 10);
-//    image(miku, loc.x, loc.y);
+  public void Show(){
+    //fill(255); // Make the face seeable    
+    //stroke(0, 255, 0); // Make the frame green
+    //strokeWeight(3); // Make the frame width 3    
+    //ellipse(loc.x, loc.y, 10, 10);
+    
     if(!didIhit){
       if(whatIam == 0) image(miku1,  loc.x, loc.y);
       if(whatIam == 1) image(goku1,  loc.x, loc.y);
       if(whatIam == 2) image(tsuru1, loc.x, loc.y);
+      //if(whatIam == 3) image(ame1, loc.x, loc.y); // for ame
     }
     else{
       if(whatIam == 0) image(miku2,  loc.x, loc.y);
       if(whatIam == 1) image(goku2,  loc.x, loc.y);
       if(whatIam == 2) image(tsuru2, loc.x, loc.y);
-    }    
+      //if(whatIam == 3) image(ame2, loc.x, loc.y); // for ame
+    }
+    
     // Did I hit the face?
     for (int i = 0; i < rects.length; ++i) {
       ellipse(rects[i].x/ratio                     , rects[i].y/ratio                      , 5, 5);            
@@ -326,5 +342,14 @@ class Sphere{
       ellipse(rects[i].x/ratio+rects[i].width/ratio, rects[i].y/ratio+rects[i].height/ratio, 5, 5);            
     }
     
+  }
+}
+  static public void main(String[] passedArgs) {
+    String[] appletArgs = new String[] { "--full-screen", "--bgcolor=#666666", "--stop-color=#cccccc", "mikumiku2" };
+    if (passedArgs != null) {
+      PApplet.main(concat(appletArgs, passedArgs));
+    } else {
+      PApplet.main(appletArgs);
+    }
   }
 }

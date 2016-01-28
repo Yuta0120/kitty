@@ -72,11 +72,19 @@ Rect [] rects;
 boolean IsDragged = false;
 
 public void setup() {
+  //fullScreen();
   size(640, 480);
   //size(720, 480);
+  //size(1280, 720);  
   ratio = 0.5f;
   w = PApplet.parseInt(width*ratio);
   h = PApplet.parseInt(height*ratio);
+
+  if(frame != null){
+    frame.setResizable(true);
+  }
+
+  size(displayWidth, displayHeight);
 
   background(0);
   // Define and initialise the default capture device.
@@ -104,11 +112,11 @@ public void setup() {
   stroke(255, 255, 0);  
   
   // Setup miku
-  miku1  = loadImage("Miku1.jpg" );  
+  miku1  = loadImage("Miku1.png" );  
   miku2  = loadImage("Miku2.png" );
-  goku1  = loadImage("Goku1.jpg" );  
-  goku2  = loadImage("Goku2.jpg" );
-  tsuru1 = loadImage("Tsuru1.jpg");  
+  goku1  = loadImage("Goku1.png" );  
+  goku2  = loadImage("Goku2.png" );
+  tsuru1 = loadImage("Tsuru1.png");  
   tsuru2 = loadImage("Tsuru2.png");
   
   // Setup spheres
@@ -225,6 +233,7 @@ class Sphere{
     acc      = acc0;
     diameter = diam;
     whatIam  = myNumber();
+    didIhit  = false;
   }
 
   public void Update(){

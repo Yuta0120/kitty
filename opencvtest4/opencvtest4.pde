@@ -14,6 +14,13 @@ PImage miku;
 void setup() {
   
   size(640, 480);
+  
+  //if(frame != null){
+    //frame.setResizable(true);
+  //}
+
+  //size(displayWidth, displayHeight);
+  
   video = new Capture(this, width/2, height/2);
   opencv = new OpenCV(this, width/2, height/2);
   opencv.loadCascade(OpenCV.CASCADE_FRONTALFACE);  
@@ -214,7 +221,7 @@ class Sphere{
     strokeWeight(3); // Make the frame width 3    
     //ellipse(loc.x, loc.y, diameter, diameter);
     //ellipse(loc.x, loc.y, 10, 10);
-    image(miku, loc.x, loc.y);
+    //image(miku, loc.x, loc.y);
     
     // Did I hit the face?
     for (int i = 0; i < faces.length; ++i) {
